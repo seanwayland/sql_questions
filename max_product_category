@@ -1,0 +1,17 @@
+with CTE as (
+    select product_category, 
+        product_name, 
+        TRIM(price,'$')::FLOAT as modified_price
+    from innerwear_amazon_com
+    group by product_category, product_name, price
+ )
+select product_category, product_name, modified_price
+from CTE
+where modified_price in (
+    select max(modified_price) over (partition by product_category)
+        from CTE)
+group by product_category, product_name, modified_price
+
+
+-- ind the most expensive products on Amazon for each product category. Output category, product name and the price (as a number)
+-- price is a varchar in the DB 
